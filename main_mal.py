@@ -4,6 +4,7 @@ import requests
 import json
 import time
 from keep_alive import keep_alive
+from discord.utils import get
 
 
 def remove_html_tags(text):
@@ -70,7 +71,7 @@ def ani(q, author, M_flag):
             genres += element["name"] + ", "  
     content = "\n" + dic["synopsis"][:2048] + "\n\n"
     if M_flag == 0:
-        stats = "Type: " + dic["type"] + "\nStatus:" + dic["status"] + "\nStudios: " + studios + "\nEpisdoes: " + dic["episodes"] + "\nPremiered: " + dic["premiered"] +"\nScore: " + dic["score"] + "\nRating: " + dic["rating"] + "\nGenres: " + genres  
+        stats = "Type: " + dic["type"] + "\nStatus:" + dic["status"] + "\nStudios: " + studios + "\nEpisodes: " + dic["episodes"] + "\nPremiered: " + dic["premiered"] +"\nScore: " + dic["score"] + "\nRating: " + dic["rating"] + "\nGenres: " + genres  
 
     else:
         stats =  "\nType: " + dic["type"] + "\nStatus: " + dic["status"] + "\nAuthors: " + auth + "\nChapters: " + dic["chapters"] + "\nVolumes: " + dic["volumes"] + "\nPublished: " + published +"\nScore: " + dic["score"] + "\nGenres: " + genres
@@ -88,11 +89,24 @@ def ani(q, author, M_flag):
 
 def mov(q, author,T_flag):
     key = os.environ["api_key"]
-    
-    if T_flag == 0:
-        url = "http://www.omdbapi.com/?t=" + q + "&type=movie&apikey=" + key
+    temp_list = q.split('(')
+    q = temp_list[0]
+    if len(temp_list) != 1:  
+      year_string = temp_list[-1][:-1]
     else:
-        url = "http://www.omdbapi.com/?t=" + q + "&type=series&apikey=" + key    
+      year_string = "awooga"    
+    try:
+      k = int(year_string)
+      if T_flag == 0:
+        url = "http://www.omdbapi.com/?t=" + q + "&y=" + year_string + "&type=movie&apikey=" + key
+
+      else:
+        url = "http://www.omdbapi.com/?t=" + q + "&y=" + year_string + "&type=series&apikey=" + key
+    except ValueError:  
+      if T_flag == 0:
+          url = "http://www.omdbapi.com/?t=" + q + "&type=movie&apikey=" + key
+      else:
+          url = "http://www.omdbapi.com/?t=" + q + "&type=series&apikey=" + key    
     response = requests.get(url)
     data = response.json()
     if data["Response"] == "False":
@@ -259,9 +273,8 @@ async def on_ready():
 @client.event
 async def on_message(message):
     if message.author == client.user:
-        return
+        return 
     msg = message.content    
-    
     if msg.startswith('r!help'):
         await message.channel.send(embed = hel(message.author))
     lst = msg.split()
