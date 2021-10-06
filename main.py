@@ -1,12 +1,13 @@
 import os
 import discord
+from discord import AllowedMentions
 from keep_alive import keep_alive
 from replit import db
-from al import al, profile, register
+from al import al, profile, register, leaderboard
 from mal import mal
 from others import mov, book, trace
 
-def hel(author):
+def hel(author, server_id):
     embed = discord.Embed(
         title="Help Page",
         description = "List of available commands"
@@ -17,9 +18,14 @@ def hel(author):
     embed.add_field(name="Movie", value="r!movie <query>", inline=False)
     embed.add_field(name="Book", value="r!book <query>", inline=False)
     embed.add_field(name="Trace", value="r!trace <image url>", inline=False)
+    if server_id == 582854818243018752 or server_id == 681089524226457620: 
+      embed.add_field(name="Register", value="r!register <your AL username>\nRegister your Anlist account, for example 'r!register Qfu10'", inline=False)
+      embed.add_field(name="Profile", value="r!profile\nCheck your AL stats(you need to be registered for this)", inline=False)
+      embed.add_field(name="Leaderboard", value="r!leaderboard or r!lb\nCheck the leaderboard for where you stand in the server, also you can check other some page x by 'r!lb x', for example 'r!lb 2' gets the 2nd page of the leaderboard", inline=False)
+      embed.add_field(name="Delete", value="r!delete\nDelete your AL account in the bot's database", inline=False)
     embed.set_footer(icon_url=author.avatar_url, text=f"Requested by {author.name}")
     return embed
-client = discord.Client()
+client = discord.Client(allowed_mentions = AllowedMentions().none())
 
 @client.event
 async def on_ready():
@@ -34,7 +40,7 @@ async def on_message(message):
     
     msg = message.content    
     if msg.startswith('r!help'):
-        await message.channel.send(embed = hel(message.author))
+        await message.channel.send(embed = hel(message.author, message.guild.id))
     lst = msg.split()
     if len(lst) == 0:
       return
@@ -48,13 +54,15 @@ async def on_message(message):
       elif prefix == "r!register":
         await message.channel.send(embed = register(q, message.author))
       elif prefix == "r!profile":
-          await message.channel.send(embed = profile(message.author))
+          await message.channel.send(embed = profile(q, message.author))
       elif prefix == "r!delete":
           del db[str(message.author.id)] 
           embed = discord.Embed(
                 title="Account Deleted"
             )
-          await message.channel.send(embed = embed)  
+          await message.channel.send(embed = embed) 
+      elif prefix == "r!leaderboard" or prefix == "r!lb":
+          await message.channel.send(embed = leaderboard(q, message.author))     
     else:
       if prefix == "r!anime":
           await message.channel.send(embed = mal(q, message.author, 0))
