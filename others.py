@@ -6,7 +6,9 @@ import time
 
 
 def mov(q, author,T_flag):
-    key = os.environ["api_key"]
+    f = open('secrets.json')
+    secrets = json.load(f)
+    key = secrets["api_key"]
     temp_list = q.split('(')
     q = temp_list[0]
     if len(temp_list) != 1:  

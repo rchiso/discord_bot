@@ -5,7 +5,9 @@ import os
 from requests.structures import CaseInsensitiveDict 
 
 def mal(q, author, M_flag):
-    token = os.environ["mal_token"]
+    f = open('secrets.json')
+    secrets = json.load(f)
+    token = secrets["mal_token"]
     headers = CaseInsensitiveDict()
     headers["Authorization"] = "Bearer " + token
     if M_flag == 0:

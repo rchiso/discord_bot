@@ -1,7 +1,7 @@
 import json
 import requests
 import discord
-from replit import db
+
 
 def remove_html_tags(text):
     """Remove html tags from a string"""
@@ -171,7 +171,10 @@ def al(q, author, M_flag):
         )
       error.set_image(url = "https://media1.tenor.com/images/0c143322f7e7d772353a965720338aa4/tenor.gif?itemid=19978494")
       return error
-      
+    
+
+    f = open('db.json')
+    db = json.load(f)
     try:
       if str(author.id) in db.keys():
         query='''
@@ -233,6 +236,9 @@ def al(q, author, M_flag):
 def profile(q, auth):
   #[discord_id] = [al_username, animedays, animescore, animecount, mangadays, mangascore, mangacount, profilepic_url]
   id_ = str(auth.id)
+
+  f = open('db.json')
+  db = json.load(f)
   q  = q[-19:-1]
   if q in db.keys():
     id_ = q
@@ -358,14 +364,21 @@ def register(q, author):
   manga_days = max(x, y)
 
   #[discord_id] = [al_username, animedays, animescore, animecount, mangadays, mangascore, mangacount, profilepic_url]
-  db[str(author.id)] = [q, anime_days, anime_score, anime_count, manga_days, manga_score, manga_count, avatar_url]
 
+  f = open('db.json')
+  db = json.load(f)
+  db[str(author.id)] = [q, anime_days, anime_score, anime_count, manga_days, manga_score, manga_count, avatar_url]
+  with open('db.json', 'w') as fp:
+    json.dump(db, fp)
   embed = discord.Embed(
               title="Registration Successful"
           )
   return embed
 
 def leaderboard(q, author):
+
+  f = open('db.json')
+  db = json.load(f)
   dic1 = {}
   dic2 = {}
   for element in db.keys():

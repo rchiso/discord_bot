@@ -1,11 +1,10 @@
 import os
 import discord
 from discord import AllowedMentions
-from keep_alive import keep_alive
-from replit import db
 from al import al, profile, register, leaderboard
 from mal import mal
-from others import mov, book, trace
+from others import mov, book
+import json
 
 def hel(author, server_id):
     embed = discord.Embed(
@@ -17,7 +16,7 @@ def hel(author, server_id):
     embed.add_field(name="TV Show", value="r!tv <query>", inline=False)
     embed.add_field(name="Movie", value="r!movie <query>", inline=False)
     embed.add_field(name="Book", value="r!book <query>", inline=False)
-    embed.add_field(name="Trace", value="r!trace <image url>", inline=False)
+    #embed.add_field(name="Trace", value="r!trace <image url>", inline=False)
     if server_id == 582854818243018752 or server_id == 681089524226457620: 
       embed.add_field(name="Register", value="r!register <your AL username>\nRegister your Anlist account, for example 'r!register Qfu10'", inline=False)
       embed.add_field(name="Profile", value="r!profile\nCheck your AL stats(you need to be registered for this)", inline=False)
@@ -31,6 +30,8 @@ client = discord.Client(allowed_mentions = AllowedMentions().none())
 async def on_ready():
     print('Logged in as {0.user}'.format(client))
     await client.change_presence(activity=discord.Game(name="r!help"))
+    ch = client.get_channel(819858607537389578)
+    await ch.send("**hi**")
 
 
 @client.event
@@ -56,7 +57,11 @@ async def on_message(message):
       elif prefix == "r!profile":
           await message.channel.send(embed = profile(q, message.author))
       elif prefix == "r!delete":
+          f = open('db.json')
+          db = json.load(f)
           del db[str(message.author.id)] 
+          with open('db.json', 'w') as fp:
+            json.dump(db, fp)
           embed = discord.Embed(
                 title="Account Deleted"
             )
@@ -74,12 +79,13 @@ async def on_message(message):
         await message.channel.send(embed = mov(q, message.author,1))
     elif prefix == "r!book" or prefix == "r!books":
         await message.channel.send(embed = book(q, message.author))
-    elif prefix == "r!trace" or prefix == "r!search":
-        await message.channel.send(embed = trace(q, message.author))
+    #elif prefix == "r!trace" or prefix == "r!search":
+    #    await message.channel.send(embed = trace(q, message.author))
        
 
         
-    
-keep_alive()
 
-client.run(os.environ['TOKEN'])
+
+f = open('secrets.json')
+secrets = json.load(f)
+client.run(secrets['TOKEN'])
