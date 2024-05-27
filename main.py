@@ -57,15 +57,16 @@ async def on_message(message):
       elif prefix == "r!profile":
           await message.channel.send(embed = profile(q, message.author))
       elif prefix == "r!delete":
-          f = open('db.json')
-          db = json.load(f)
-          del db[str(message.author.id)] 
-          with open('db.json', 'w') as fp:
-            json.dump(db, fp)
-          embed = discord.Embed(
-                title="Account Deleted"
-            )
-          await message.channel.send(embed = embed) 
+          if message.author.id == 249855890381996032:
+            f = open('db.json')
+            db = json.load(f)
+            del db[q] 
+            with open('db.json', 'w') as fp:
+                json.dump(db, fp)
+            embed = discord.Embed(
+                    title="Account Deleted"
+                )
+            await message.channel.send(embed = embed) 
       elif prefix == "r!leaderboard" or prefix == "r!lb":
           await message.channel.send(embed = leaderboard(q, message.author))     
     else:
